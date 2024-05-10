@@ -1,0 +1,45 @@
+{
+  "name": "react-redux-ext",
+  "version": "1.0.0",
+  "description": "Provide current and historical page speeds",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'",
+    "testUpdate": "jest --updateSnapshot",
+    "build": "NODE_ENV=production webpack --config webpack.config.js"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.2.3",
+    "react": "^18.3.1",
+    "react-chrome-redux": "^2.0.0-alpha.5",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.1.1",
+    "react-test-renderer": "^18.2.0",
+    "redux-logger": "^3.0.6",
+    "styled-components": "^6.1.8",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/protectednet/page-speed-insights-exercise.git"
+  },
+  "keywords": [],
+  "author": "Callum Dewane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/protectednet/page-speed-insights-exercise/issues"
+  },
+  "homepage": "https://github.com/protectednet/page-speed-insights-exercise#readme",
+  "devDependencies": {
+    "@types/chrome": "^0.0.266",
+    "@types/jest": "^29.5.12",
+    "@types/react-dom": "^18.2.25",
+    "@types/react-test-renderer": "^18.0.7",
+    "jest": "^29.7.0",
+    "ts-loader": "^9.5.1"
+  }
+}
