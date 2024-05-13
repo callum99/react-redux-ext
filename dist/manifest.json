@@ -1,8 +1,8 @@
 {
   "manifest_version" : 3,
-  "name" : "Page speed insight ext",
+  "name" : "React redux ext",
   "version" : "1.0.0",
-  "description" : "An extension to show current and historic page speeds",
+  "description" : "An extension to utilising reactJS and Redux",
   "permissions": ["activeTab", "scripting", "storage", "unlimitedStorage", "tabs"],
   "action": {
     "default_popup": "index.html",
