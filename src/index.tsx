@@ -7,10 +7,6 @@ import { ReduxSingletonInstance } from "./app/store/reduxSingletonInstance";
 // Fetch storage and set as initial state if exists.
 (async () => {
     await ReduxSingletonInstance.initFactory(true);
-
-    ReduxSingletonInstance.get()?.subscribe(() => {
-        console.log('REACT SUBSCRIBED!!', ReduxSingletonInstance.get()?.getState());
-    });
 })();
 
 // Using strict mode, ! (bang) to specify never null
