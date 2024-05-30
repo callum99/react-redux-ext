@@ -1,10 +1,11 @@
-import ReduxWrapper from "./app/store/reduxWrapper";
-import rootReducers from "./app/store/reducers/rootSlice";
+import { ReduxSingletonInstance } from './app/store/reduxSingletonInstance';
 
-const serviceWorkerStore = new ReduxWrapper(rootReducers, false);
+// This has been added for demostration purposes while im learning the
+// setup, currently not in use.
+(async () => {
+    await ReduxSingletonInstance.initFactory(false);
 
-// Subscribing is not needed, as I'm not utilising the data at this point.
-// but for my own learning benefit I have included it.
-serviceWorkerStore.subscribe(() => {
-    console.log('service worker counter', serviceWorkerStore.getState().counter.value);
-});
+    ReduxSingletonInstance.get()?.subscribe(() => {
+        console.log('SERVICE WORKER SUBSCRIBED!!', ReduxSingletonInstance.get()?.getState());
+    });
+})();
