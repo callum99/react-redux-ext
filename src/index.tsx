@@ -4,7 +4,7 @@ import App from "./app";
 import { ReduxSingletonInstance } from "./app/store/reduxSingletonInstance";
 
 // Initilising React store instance before start of app as it is async code.
-// Fetch storage and set as initial state if exists.
+// Fetch storage and set as initial state of store if exists.
 (async () => {
     await ReduxSingletonInstance.initFactory(true);
 })();
