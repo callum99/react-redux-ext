@@ -1,17 +1,16 @@
 const path = require('path');
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     entry: {
         'popup': './src/index.tsx',
         'content-script': './src/contentScript.tsx',
         'service-worker': './src/background.tsx',
-
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
     },
-    watch: true,
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".jsx"]
     },
@@ -20,5 +19,8 @@ module.exports = {
         rules: [
             {test: /\.tsx?$/, loader:"ts-loader"},
         ]
+    },
+    optimization: {
+        usedExports: true,
     }
 };
