@@ -1,15 +1,15 @@
 import React from 'react';
-import Button from "../default/button";
-import { getReduxStoreProperties } from "../../../app/store/storeContext";
-import { ButtonType } from "../button.types";
-import { incrementAction } from "../../../app/store/reducers/counterSlice";
+import { Button } from '../default/button';
+import { ButtonType } from '../default/button.types';
+import { IncrementAction } from "../../../app/store/reducers/counterSlice";
+import { useReduxDispatcher } from '../../../hooks/useReduxDispatcher';
 
-const IncreaseButton = ({ btnText }: ButtonType) => {
-    const store = getReduxStoreProperties();
+export const IncreaseButton = ({ btnText }: ButtonType) => {
+    const dispatch = useReduxDispatcher();
 
     return (
-        <Button btnOnClick={() => store.dispatchReact(incrementAction())} btnText={btnText} />
+        <>
+            {dispatch && (<Button btnOnClick={() => dispatch(IncrementAction())} btnText={btnText} />)}
+        </>
     );
 };
-
-export default IncreaseButton;

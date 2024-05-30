@@ -2,85 +2,103 @@ import {
     combineSlices,
     configureStore,
     EnhancedStore,
-    Slice,
 } from "@reduxjs/toolkit";
+import { DispatchActionType, StoreSliceType } from '../global.types';
+import { ApplicationSlices } from "./reducers/applicationSlices";
 
-class ReduxWrapper {
+export const STORAGE_OBJECT_NAME: string = 'currentState';
+
+export class ReduxWrapper {
     private _store: EnhancedStore;
-    private readonly _isReader: boolean = true;
+    private readonly _reservedSelfUpdateActionType: string = 'reader/selfUpdate';
 
-    public constructor(public slices: { [key: string]: Slice }, _isReader:boolean) {
-        this._store = this.reduxInstance();
-        this._isReader = _isReader;
-        this.init();
+    public constructor(
+        private _slices: StoreSliceType,
+        private readonly _isReader: boolean = true,
+        private _initialState: {[key:string]: { [key:string]: Partial<DispatchActionType<any>>}}
+    ) {
+        this._store = this.createReduxStoreInstance();
+        this.setupListeners();
     };
 
-     public reduxInstance() {
-        const sliceReducer = combineSlices(...Object.values(this.slices));
+    private createReduxStoreInstance() {
+        const sliceReducer = combineSlices(...Object.values(this._slices));
 
         return configureStore({
             reducer: (state, action) => {
-                if (action.type == 'reader/selfUpdate') {
+                if (action.type == this._reservedSelfUpdateActionType) {
                     state = action.payload;
-                }
+                };
 
                 return sliceReducer(state, action);
-            }
+            },
+            preloadedState: this._initialState
         });
     };
 
-    public init() {
+    private setupListeners() {
         if (this._isReader) {
             chrome.storage.onChanged.addListener((pageStorage) => {
                 this.dispatch({
-                    type: 'reader/selfUpdate',
-                    payload: pageStorage.currentState.newValue.payload
+                    type: this._reservedSelfUpdateActionType,
+                    payload: pageStorage[STORAGE_OBJECT_NAME].newValue.payload
                 });
             });
         } else {
             chrome.runtime.onMessage.addListener((request) => {
-                const actionType = request.messageAction.type;
-                const actionPayload = request.messageAction.payload;
+                if (request.messageAction.type !== this._reservedSelfUpdateActionType) {
+                    const actionType = request.messageAction.type;
+                    const actionPayload = request.messageAction.payload;
 
-                this.dispatch({type: actionType, payload: actionPayload});
+                    this.dispatch({type: actionType, payload: actionPayload});
 
-                chrome.storage.local.set({
-                    currentState: {
-                        type: actionType,
-                        payload: this.getState(),
-                    }
-                });
-            });
-        }
-    };
-
-    public dispatch(dispatchValue: {
-        type: string,
-        payload: {[key: string] : {value: number }}
-    }) {
-        if (this._isReader && dispatchValue.type !== 'reader/selfUpdate') {
-            chrome.runtime.sendMessage({
-                messageAction: {
-                    type: dispatchValue.type,
-                    payload: dispatchValue.payload,
+                    chrome.storage.local.set({
+                        [STORAGE_OBJECT_NAME]: {
+                            type: actionType,
+                            payload: this.getState(),
+                        }
+                    });
                 }
             });
-            return;
-        }
+        };
+    };
 
-        this._store.dispatch({
-            type: dispatchValue.type,
-            payload: dispatchValue.payload
-        });
+    public dispatch(dispatchAction: DispatchActionType<any>): DispatchActionType<any> | undefined {
+        const generateAction = !dispatchAction.payload ? {
+            type: dispatchAction.type,
+        } : {
+            type: dispatchAction.type,
+            payload: dispatchAction.payload,
+        };
+
+        if (this._isReader && dispatchAction.type !== this._reservedSelfUpdateActionType) {
+            chrome.runtime.sendMessage({
+                messageAction: generateAction
+            });
+            return;
+        };
+
+        return this._store.dispatch(generateAction);
     };
 
     public subscribe(subValue: () => void) {
         return this._store.subscribe(subValue);
-    }
+    };
 
     public getState() {
         return this._store.getState();
     };
-}
 
-export default ReduxWrapper;
+    public static async initReduxWrapper (isReader:boolean): Promise<ReduxWrapper> {
+        let initialStorageState = await chrome.storage.local
+            .get(STORAGE_OBJECT_NAME)
+            .then((result) => {
+                return result[STORAGE_OBJECT_NAME] ? result[STORAGE_OBJECT_NAME].payload : {};
+            })
+            .catch((e) => {
+                throw new Error(e);
+            });
+
+        return new ReduxWrapper(ApplicationSlices, isReader, initialStorageState);
+    };
+};

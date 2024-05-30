@@ -1,34 +1,23 @@
-import {createAction, createSlice} from '@reduxjs/toolkit'
-import {DECREMENT, INCREMENT, INCREMENT_BY_AMOUNT} from "./actions/actions.const";
+import { createAction, createSlice } from '@reduxjs/toolkit'
+import { DECREMENT, INCREMENT } from "./actions/actions.const";
+import { DispatchActionType } from 'src/app/global.types';
 
-interface CounterState {
-    value: number
-}
-
-const initialState:CounterState = {
-    value: 0
+const initialState: { count:number } = {
+    count: 0
 };
 
-export const counterSlice = createSlice({
+export const CounterSlice = createSlice({
     name: 'counter',
     initialState,
     reducers: {
-        increment: state => {
-            state.value += 1;
+        increment: (state, action: DispatchActionType<any>) => {
+            state.count += (action.payload || 1);
         },
-        reservedIncrementReadOnly: state => {
-            state.value += 1;
-        },
-        decrement: state => {
-            state.value -= 1;
-        },
-        incrementByAmount: (state, action) => {
-            state.value += action.payload;
+        decrement: (state, action: DispatchActionType<any>) => {
+            state.count -= (action.payload || 1);
         }
     }
 });
 
-export const incrementAction = createAction(INCREMENT);
-export const decrementAction = createAction(DECREMENT);
-export const incrementByAmountAction = createAction(INCREMENT_BY_AMOUNT);
-export default counterSlice.reducer;
+export const IncrementAction = createAction<number | undefined>(INCREMENT);
+export const DecrementAction = createAction<number | undefined>(DECREMENT);

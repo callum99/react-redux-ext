@@ -1,3 +1,2 @@
-export const INCREMENT = 'counter/increment';
-export const DECREMENT = 'counter/decrement';
-export const INCREMENT_BY_AMOUNT = 'counter/incrementByAmount';
+export const INCREMENT: string = 'counter/increment';
+export const DECREMENT: string = 'counter/decrement';
