@@ -2,7 +2,7 @@ import { createAction, createSlice } from '@reduxjs/toolkit'
 import { DECREMENT, INCREMENT } from "./actions/actions.const";
 import { DispatchActionType } from 'src/app/global.types';
 
-const initialState: {count:number} = {
+const initialState: { count:number } = {
     count: 0
 };
 
