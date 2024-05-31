@@ -13,8 +13,7 @@ export class ReduxWrapperFactory {
 
             if (this._storeInitialising) {
                 this._storeCreatedCallbacks.push(() => {
-                    // Using ! (bang) as this method will not
-                    // be called till store is defined.
+                    // Using strict mode, ! (bang) to specify never null
                     return resolve(this._store!);
                 });
                 return;

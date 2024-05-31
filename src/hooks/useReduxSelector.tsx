@@ -2,18 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { ReduxSingletonInstance } from '../app/store/reduxSingletonInstance';
 
 export const useReduxSelector = (selector: (state: any) => any ) => {
-    const ReaderFactory = ReduxSingletonInstance;
-    const [ selectedValue, setSelectedValue ] = useState(selector(ReaderFactory.get().getState()));
+    const [ selectedValue, setSelectedValue ] = useState(selector(ReduxSingletonInstance.get().getState()));
 
     useEffect(() => {
-        const unsubscribe = ReaderFactory.get().subscribe(() => {
-            if (selectedValue !== ReaderFactory.get().getState()) {
-                setSelectedValue(selector(ReaderFactory.get().getState()));
+        const unsubscribe = ReduxSingletonInstance.get().subscribe(() => {
+            if (selectedValue !== ReduxSingletonInstance.get().getState()) {
+                setSelectedValue(selector(ReduxSingletonInstance.get().getState()));
             }
         });
 
         return unsubscribe;
     }, []);
 
-    return [selectedValue, ReaderFactory.get().dispatch.bind(ReaderFactory)];
+    return [selectedValue, ReduxSingletonInstance.get().dispatch.bind(ReduxSingletonInstance)];
 };
