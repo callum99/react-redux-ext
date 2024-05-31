@@ -3,31 +3,31 @@ import {
     configureStore,
     EnhancedStore,
 } from "@reduxjs/toolkit";
-import { DispatchActionType, StoreSliceType } from '../global.types';
+import { DispatchActionType } from '../global.types';
 import { ApplicationSlices } from "./reducers/applicationSlices";
-
-export const STORAGE_OBJECT_NAME: string = 'currentState';
 
 export class ReduxWrapper {
     private _store: EnhancedStore;
     private readonly _reservedSelfUpdateActionType: string = 'reader/selfUpdate';
+    private static readonly _storageObjectName: string = 'currentState';
 
     public constructor(
-        private _slices: StoreSliceType,
-        private readonly _isReader: boolean = true,
-        private _initialState: {[key:string]: { [key:string]: Partial<DispatchActionType<any>>}}
+        private _initialState: {[key:string]: { [key:string]: Partial<DispatchActionType<any>>}},
+        private readonly _isReader: boolean = true
     ) {
         this._store = this.createReduxStoreInstance();
         this.setupListeners();
     };
 
     private createReduxStoreInstance() {
-        const sliceReducer = combineSlices(...Object.values(this._slices));
+        const sliceReducer = combineSlices(...Object.values(ApplicationSlices));
 
         return configureStore({
             reducer: (state, action) => {
                 if (action.type == this._reservedSelfUpdateActionType) {
                     state = action.payload;
+
+                    return state;
                 };
 
                 return sliceReducer(state, action);
@@ -41,7 +41,7 @@ export class ReduxWrapper {
             chrome.storage.onChanged.addListener((pageStorage) => {
                 this.dispatch({
                     type: this._reservedSelfUpdateActionType,
-                    payload: pageStorage[STORAGE_OBJECT_NAME].newValue.payload
+                    payload: pageStorage[ReduxWrapper._storageObjectName].newValue
                 });
             });
         } else {
@@ -53,10 +53,7 @@ export class ReduxWrapper {
                     this.dispatch({type: actionType, payload: actionPayload});
 
                     chrome.storage.local.set({
-                        [STORAGE_OBJECT_NAME]: {
-                            type: actionType,
-                            payload: this.getState(),
-                        }
+                        [ReduxWrapper._storageObjectName]: this.getState()
                     });
                 }
             });
@@ -64,21 +61,14 @@ export class ReduxWrapper {
     };
 
     public dispatch(dispatchAction: DispatchActionType<any>): DispatchActionType<any> | undefined {
-        const generateAction = !dispatchAction.payload ? {
-            type: dispatchAction.type,
-        } : {
-            type: dispatchAction.type,
-            payload: dispatchAction.payload,
-        };
-
         if (this._isReader && dispatchAction.type !== this._reservedSelfUpdateActionType) {
             chrome.runtime.sendMessage({
-                messageAction: generateAction
+                messageAction: dispatchAction
             });
             return;
         };
 
-        return this._store.dispatch(generateAction);
+        return this._store.dispatch({type: dispatchAction.type, payload:dispatchAction.payload});
     };
 
     public subscribe(subValue: () => void) {
@@ -90,15 +80,9 @@ export class ReduxWrapper {
     };
 
     public static async initReduxWrapper (isReader:boolean): Promise<ReduxWrapper> {
-        let initialStorageState = await chrome.storage.local
-            .get(STORAGE_OBJECT_NAME)
-            .then((result) => {
-                return result[STORAGE_OBJECT_NAME] ? result[STORAGE_OBJECT_NAME].payload : {};
-            })
-            .catch((e) => {
-                throw new Error(e);
-            });
+        const getStorage = await chrome.storage.local.get([this._storageObjectName]);
+        const initialStorageState = getStorage[this._storageObjectName] ? getStorage[this._storageObjectName] : {}
 
-        return new ReduxWrapper(ApplicationSlices, isReader, initialStorageState);
+        return new ReduxWrapper(initialStorageState, isReader);
     };
 };

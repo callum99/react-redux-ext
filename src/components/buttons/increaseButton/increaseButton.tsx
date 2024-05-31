@@ -7,9 +7,5 @@ import { useReduxDispatcher } from '../../../hooks/useReduxDispatcher';
 export const IncreaseButton = ({ btnText }: ButtonType) => {
     const dispatch = useReduxDispatcher();
 
-    return (
-        <>
-            {dispatch && (<Button btnOnClick={() => dispatch(IncrementAction())} btnText={btnText} />)}
-        </>
-    );
+    return (<Button btnOnClick={() => dispatch(IncrementAction())} btnText={btnText} />);
 };

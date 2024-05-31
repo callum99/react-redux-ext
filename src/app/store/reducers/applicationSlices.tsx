@@ -1,5 +1,5 @@
 import { CounterSlice } from "./counterSlice";
-import { StoreSliceType } from "src/app/global.types";
+import { StoreSliceType } from "../../../app/global.types";
 
 export const ApplicationSlices: StoreSliceType = {
     counter: CounterSlice
