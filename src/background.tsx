@@ -5,7 +5,7 @@ import { ReduxSingletonInstance } from './app/store/reduxSingletonInstance';
 (async () => {
     await ReduxSingletonInstance.initFactory(false);
 
-    ReduxSingletonInstance.get()?.subscribe(() => {
+    ReduxSingletonInstance.get().subscribe(() => {
         console.log('SERVICE WORKER SUBSCRIBED!!', ReduxSingletonInstance.get()?.getState());
     });
 })();

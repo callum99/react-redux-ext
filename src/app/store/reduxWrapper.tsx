@@ -47,10 +47,10 @@ export class ReduxWrapper {
         } else {
             chrome.runtime.onMessage.addListener((request) => {
                 if (request.messageAction.type !== this._reservedSelfUpdateActionType) {
-                    const actionType = request.messageAction.type;
-                    const actionPayload = request.messageAction.payload;
-
-                    this.dispatch({type: actionType, payload: actionPayload});
+                    this.dispatch({
+                        type: request.messageAction.type,
+                        payload: request.messageAction.payload
+                    });
 
                     chrome.storage.local.set({
                         [ReduxWrapper._storageObjectName]: this.getState()
@@ -68,7 +68,10 @@ export class ReduxWrapper {
             return;
         };
 
-        return this._store.dispatch({type: dispatchAction.type, payload:dispatchAction.payload});
+        return this._store.dispatch({
+            type: dispatchAction.type,
+            payload:dispatchAction.payload
+        });
     };
 
     public subscribe(subValue: () => void) {
@@ -80,7 +83,7 @@ export class ReduxWrapper {
     };
 
     public static async initReduxWrapper (isReader:boolean): Promise<ReduxWrapper> {
-        const getStorage = await chrome.storage.local.get([this._storageObjectName]);
+        const getStorage = await chrome.storage.local.get(this._storageObjectName);
         const initialStorageState = getStorage[this._storageObjectName] ? getStorage[this._storageObjectName] : {}
 
         return new ReduxWrapper(initialStorageState, isReader);
