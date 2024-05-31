@@ -7,10 +7,10 @@ import { ReduxSingletonInstance } from "./app/store/reduxSingletonInstance";
 // Fetch storage and set as initial state of store if exists.
 (async () => {
     await ReduxSingletonInstance.initFactory(true);
-})();
 
-// Using strict mode, ! (bang) to specify never null
-const root = createRoot(document.getElementById('root')!);
-root.render(
-    <App />
-);
+    // Using strict mode, ! (bang) to specify never null
+    const root = createRoot(document.getElementById('root')!);
+    root.render(
+        <App />
+    );
+})();

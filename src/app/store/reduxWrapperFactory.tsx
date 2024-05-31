@@ -6,31 +6,42 @@ export class ReduxWrapperFactory {
     private _storeCreatedCallbacks: Array<() => void> = [];
 
     public initFactory (isReader: boolean): Promise<ReduxWrapper> {
-        return new Promise(async (resolve, reject) => {
+        return new Promise((resolve, reject) => {
             if (this._store) {
                 return resolve(this._store);
             };
 
             if (this._storeInitialising) {
                 this._storeCreatedCallbacks.push(() => {
-                    return this._store ? resolve(this._store) : reject(this._store);
+                    // Using ! (bang) as this method will not
+                    // be called till store is defined.
+                    return resolve(this._store!);
                 });
                 return;
             };
 
             this._storeInitialising = true;
-            this._store = await ReduxWrapper.initReduxWrapper(isReader);
-            this._storeCreatedCallbacks.forEach((storeCreated) => {
-                return storeCreated();
-            });
 
-            this._storeCreatedCallbacks = [];
-            this._storeInitialising = false;
-            return resolve(this._store);
+            ReduxWrapper.initReduxWrapper(isReader)
+                .then((results) => {
+                    this._store = results;
+                    this._storeCreatedCallbacks.forEach((storeCreated) => {
+                        return storeCreated();
+                    });
+
+                    this._storeCreatedCallbacks = [];
+                    this._storeInitialising = false;
+
+                    return resolve(this._store);
+                })
+                .catch(() => {
+                    reject(this._store);
+                });
         });
     };
 
     public get () {
+        if (!this._store) throw new Error("no store");
         return this._store;
     };
 };

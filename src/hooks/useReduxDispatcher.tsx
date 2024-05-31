@@ -1,19 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ReduxSingletonInstance } from '../app/store/reduxSingletonInstance'
 
 export const useReduxDispatcher = () => {
-    const ReaderFactory = ReduxSingletonInstance;
-    const [ dispatchReady, setDispatchReady ] = useState(false);
+    const dispatch = ReduxSingletonInstance.get().dispatch.bind(ReduxSingletonInstance);
 
-    useEffect(() => {
-        const unsubscribe = ReaderFactory.get()?.subscribe(() => {
-            if (ReaderFactory.get()?.dispatch) {
-                setDispatchReady(true);
-            }
-        });
-
-        return unsubscribe;
-    }, [dispatchReady]);
-
-    return ReaderFactory.get()?.dispatch.bind(ReaderFactory);
+    if (!dispatch) throw new Error("No dispatch method.");
+    return dispatch;
 };
