@@ -12,14 +12,14 @@ export class ReduxWrapper {
     private static readonly _storageObjectName: string = 'currentState';
 
     public constructor(
-        private _initialState: {[key:string]: { [key:string]: Partial<DispatchActionType<any>>}},
+        initialState: {[key:string]: { [key:string]: any}},
         private readonly _isReader: boolean = true
     ) {
-        this._store = this.createReduxStoreInstance();
+        this._store = this.createReduxStoreInstance(initialState);
         this.setupListeners();
     };
 
-    private createReduxStoreInstance() {
+    private createReduxStoreInstance(initialState: {[key:string]: { [key:string]: any}}) {
         const sliceReducer = combineSlices(...Object.values(ApplicationSlices));
 
         return configureStore({
@@ -32,7 +32,7 @@ export class ReduxWrapper {
 
                 return sliceReducer(state, action);
             },
-            preloadedState: this._initialState
+            preloadedState: initialState
         });
     };
 

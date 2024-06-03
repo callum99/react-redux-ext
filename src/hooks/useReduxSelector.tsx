@@ -6,13 +6,15 @@ export const useReduxSelector = (selector: (state: any) => any ) => {
 
     useEffect(() => {
         const unsubscribe = ReduxSingletonInstance.get().subscribe(() => {
-            if (selectedValue !== ReduxSingletonInstance.get().getState()) {
-                setSelectedValue(selector(ReduxSingletonInstance.get().getState()));
+            const selectorValue = selector(ReduxSingletonInstance.get().getState());
+
+            if (selectedValue !== selectorValue) {
+                setSelectedValue(selectorValue);
             }
         });
 
         return unsubscribe;
-    }, []);
+    }, [selectedValue]);
 
     return [selectedValue, ReduxSingletonInstance.get().dispatch.bind(ReduxSingletonInstance)];
 };
