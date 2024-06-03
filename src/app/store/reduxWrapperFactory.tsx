@@ -9,21 +9,20 @@ export class ReduxWrapperFactory {
         return new Promise((resolve, reject) => {
             if (this._store) {
                 return resolve(this._store);
-            };
+            }
 
             if (this._storeInitialising) {
                 this._storeCreatedCallbacks.push(() => {
-                    // Using strict mode, ! (bang) to specify never null
-                    return resolve(this._store!);
+                    return this._store;
                 });
                 return;
-            };
+            }
 
             this._storeInitialising = true;
 
             ReduxWrapper.initReduxWrapper(isReader)
-                .then((results) => {
-                    this._store = results;
+                .then((storeInstance) => {
+                    this._store = storeInstance;
                     this._storeCreatedCallbacks.forEach((storeCreated) => {
                         return storeCreated();
                     });
@@ -33,9 +32,7 @@ export class ReduxWrapperFactory {
 
                     return resolve(this._store);
                 })
-                .catch(() => {
-                    reject(this._store);
-                });
+                .catch(reject);
         });
     };
 
@@ -43,4 +40,4 @@ export class ReduxWrapperFactory {
         if (!this._store) throw new Error("no store");
         return this._store;
     };
-};
+}
