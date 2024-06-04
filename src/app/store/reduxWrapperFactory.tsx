@@ -24,7 +24,7 @@ export class ReduxWrapperFactory {
                 .then((storeInstance) => {
                     this._store = storeInstance;
                     this._storeCreatedCallbacks.forEach(storeCreated => {
-                        storeCreated(this._store);
+                        return storeCreated(this._store);
                     });
 
                     this._storeCreatedCallbacks = [];
