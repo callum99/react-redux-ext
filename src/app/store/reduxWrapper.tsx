@@ -3,7 +3,7 @@ import {
     configureStore,
     EnhancedStore,
 } from "@reduxjs/toolkit";
-import { DispatchActionType } from '../global.types';
+import { DispatchActionType, initialStorageType } from '../global.types';
 import { ApplicationSlices } from "./reducers/applicationSlices";
 
 export class ReduxWrapper {
@@ -12,14 +12,14 @@ export class ReduxWrapper {
     private static readonly _storageObjectName: string = 'currentState';
 
     public constructor(
-        private _initialState: {[key:string]: { [key:string]: Partial<DispatchActionType<any>>}},
+        initialState: initialStorageType,
         private readonly _isReader: boolean = true
     ) {
-        this._store = this.createReduxStoreInstance();
+        this._store = this.createReduxStoreInstance(initialState);
         this.setupListeners();
     };
 
-    private createReduxStoreInstance() {
+    private createReduxStoreInstance(initialState: initialStorageType) {
         const sliceReducer = combineSlices(...Object.values(ApplicationSlices));
 
         return configureStore({
@@ -32,7 +32,7 @@ export class ReduxWrapper {
 
                 return sliceReducer(state, action);
             },
-            preloadedState: this._initialState
+            preloadedState: initialState
         });
     };
 

@@ -3,17 +3,17 @@ import { ReduxWrapper } from './reduxWrapper';
 export class ReduxWrapperFactory {
     private _store?: ReduxWrapper;
     private _storeInitialising: boolean = false;
-    private _storeCreatedCallbacks: Array<() => void> = [];
+    private _storeCreatedCallbacks: Array<(store?: ReduxWrapper) => void> = [];
 
-    public initFactory (isReader: boolean): Promise<ReduxWrapper> {
+    public initFactory (isReader: boolean): Promise<ReduxWrapper | undefined> {
         return new Promise((resolve, reject) => {
             if (this._store) {
                 return resolve(this._store);
             }
 
             if (this._storeInitialising) {
-                this._storeCreatedCallbacks.push(() => {
-                    return this._store;
+                this._storeCreatedCallbacks.push((store) => {
+                    return resolve(store);
                 });
                 return;
             }
@@ -23,8 +23,8 @@ export class ReduxWrapperFactory {
             ReduxWrapper.initReduxWrapper(isReader)
                 .then((storeInstance) => {
                     this._store = storeInstance;
-                    this._storeCreatedCallbacks.forEach((storeCreated) => {
-                        return storeCreated();
+                    this._storeCreatedCallbacks.forEach(storeCreated => {
+                        return storeCreated(this._store);
                     });
 
                     this._storeCreatedCallbacks = [];
