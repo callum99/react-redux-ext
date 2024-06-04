@@ -1,3 +1,3 @@
 import { ReduxWrapperFactory } from "./reduxWrapperFactory";
 
-export const ReduxSingletonInstance: ReduxWrapperFactory = new ReduxWrapperFactory();
+export const ReduxStore: ReduxWrapperFactory = new ReduxWrapperFactory();

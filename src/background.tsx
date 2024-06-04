@@ -1,11 +1,11 @@
-import { ReduxSingletonInstance } from './app/store/reduxSingletonInstance';
+import { ReduxStore } from './app/store/reduxSingletonInstance';
 
 // This has been added for demonstration purposes while im learning the
 // setup, currently not in use.
 (async () => {
-    await ReduxSingletonInstance.initFactory(false);
+    await ReduxStore.initFactory(false);
 
-    ReduxSingletonInstance.get().subscribe(() => {
-        console.log('SERVICE WORKER SUBSCRIBED!!', ReduxSingletonInstance.get().getState());
+    ReduxStore.get().subscribe(() => {
+        console.log('SERVICE WORKER SUBSCRIBED!!', ReduxStore.get().getState());
     });
 })();

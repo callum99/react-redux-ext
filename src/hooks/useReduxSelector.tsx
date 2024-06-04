@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { ReduxSingletonInstance } from '../app/store/reduxSingletonInstance';
+import { ReduxStore } from '../app/store/reduxSingletonInstance';
 import { isNonPrimitiveType } from "../utils/isPrimitiveType";
 
 export const useReduxSelector = (selector: (state:any) => any ) => {
-    const ReduxInstanceGetter = ReduxSingletonInstance.get();
-    const [ selectedValue, setSelectedValue ] = useState(selector(ReduxInstanceGetter.getState()));
+    const ReduxStoreGetter = ReduxStore.get();
+    const [ selectedValue, setSelectedValue ] = useState(selector(ReduxStoreGetter.getState()));
 
     useEffect(() => {
-        const unsubscribe = ReduxInstanceGetter.subscribe(() => {
-            const selectorValue = selector(ReduxInstanceGetter.getState());
+        const unsubscribe = ReduxStoreGetter.subscribe(() => {
+            const selectorValue = selector(ReduxStoreGetter.getState());
 
             const stateValueHasChanged = () => {
                 if (isNonPrimitiveType(selectorValue) || isNonPrimitiveType(selectedValue)) {
@@ -26,5 +26,5 @@ export const useReduxSelector = (selector: (state:any) => any ) => {
         return unsubscribe;
     }, []);
 
-    return [selectedValue, ReduxInstanceGetter.dispatch.bind(ReduxSingletonInstance)];
+    return [selectedValue, ReduxStoreGetter.dispatch.bind(ReduxStore)];
 };
