@@ -1,14 +1,22 @@
 import { Slice } from "@reduxjs/toolkit";
 
 export interface DispatchActionType<Type> {
-    type: string,
-    payload?: Type
-};
+  type: string,
+  payload?: Type
+}
 
 export interface StoreSliceType {
-    [key: string]: Slice,
-};
+  [key: string]: Slice,
+}
 
 export interface initialStorageType {
-    [key:string]: { [key:string]: any},
-};
+  [key:string]: { [key:string]: any},
+}
+
+export type ValidateType = ((value: any) => string | null | Promise<string | null>);
+
+
+
+
+
+
